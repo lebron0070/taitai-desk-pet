@@ -10,7 +10,7 @@
     "start": "electron .",
     "test": "node --test desktop/*.test.js",
     "build:mac": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg zip --config.directories.output=release",
-    "build:win": "electron-builder --win nsis zip --x64 --config.directories.output=release"
+    "build:win": "electron-builder --win nsis zip --x64 --config.directories.output=release --publish never"
   },
   "devDependencies": {
     "electron": "^37.2.3",
