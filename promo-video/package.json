@@ -1,0 +1,15 @@
+{
+  "name": "promo-video",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm dlx hyperframes@0.7.60 preview",
+    "check": "pnpm dlx hyperframes@0.7.60 check",
+    "render": "pnpm dlx hyperframes@0.7.60 render",
+    "publish": "pnpm dlx hyperframes@0.7.60 publish"
+  },
+  "devDependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@ffprobe-installer/ffprobe": "^2.1.2"
+  }
+}

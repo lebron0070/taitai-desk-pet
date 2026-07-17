@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    :root { --ink:#17231d; --dark:#314a3b; --moss:#78996f; --light:#a9bd91; --cream:#f6e9c9; --screen:#1f3431; --cyan:#9ff4d8; --orange:#e98657; }
+    * { box-sizing:border-box; user-select:none; }
+    html,body { width:100%;height:100%;margin:0;overflow:hidden;background:transparent; }
+    body { font-family:"Songti SC",serif; image-rendering:pixelated; }
+    .stage { position:relative;width:100%;height:100%;display:grid;place-items:end center;padding-bottom:10px; }
+    .bubble { position:absolute;top:4px;left:50%;z-index:9;max-width:220px;padding:8px 11px;border:2px solid var(--ink);background:var(--cream);color:var(--ink);box-shadow:4px 4px 0 rgba(23,35,29,.85);font-size:11px;line-height:1.4;white-space:nowrap;transform:translate(-50%,-7px);opacity:0;transition:opacity .12s,transform .12s;clip-path:polygon(4px 0,calc(100% - 4px) 0,calc(100% - 4px) 4px,100% 4px,100% calc(100% - 4px),calc(100% - 4px) calc(100% - 4px),calc(100% - 4px) 100%,14px 100%,14px calc(100% - 4px),4px calc(100% - 4px),4px calc(100% - 8px),0 calc(100% - 8px),0 4px,4px 4px); }
+    .bubble.show { opacity:1;transform:translate(-50%,0); }
+    .shadow { position:absolute;bottom:7px;width:116px;height:13px;background:rgba(21,34,27,.22);clip-path:polygon(12px 0,104px 0,116px 5px,116px 9px,104px 13px,12px 13px,0 9px,0 5px); }
+    .pet { position:relative;width:142px;height:142px;margin-bottom:10px;cursor:grab;transform-origin:50% 100%;animation:idle 2.6s steps(2,end) infinite;filter:drop-shadow(4px 5px 0 rgba(23,35,29,.22)); }
+    .pet[data-character="cat"] { --moss:#c9824f;--light:#edb26f;--screen:#493228;--cyan:#ffe4a8;--orange:#6f9d72; }
+    .pet[data-character="dog"] { --moss:#c89b61;--light:#efd092;--screen:#49372a;--cyan:#fff0c2;--orange:#d8694e; }
+    .pet:active{cursor:grabbing}.pet:hover{filter:brightness(1.08) drop-shadow(4px 5px 0 rgba(23,35,29,.22));}
+    .body { position:absolute;left:24px;top:28px;width:96px;height:101px;background:var(--moss);border:4px solid var(--ink);clip-path:polygon(20px 0,76px 0,76px 4px,88px 4px,88px 12px,96px 12px,96px 84px,88px 84px,88px 96px,76px 96px,76px 101px,20px 101px,20px 96px,8px 96px,8px 84px,0 84px,0 12px,8px 12px,8px 4px,20px 4px); }
+    .body::after { content:"";position:absolute;right:5px;top:15px;width:9px;height:67px;background:rgba(37,62,45,.16); }
+    .ear { position:absolute;top:17px;width:28px;height:27px;background:var(--moss);border:4px solid var(--ink);z-index:-1; }
+    .ear.l{left:26px}.ear.r{right:20px}.ear::after{content:"";position:absolute;inset:7px;background:var(--orange)}
+    .sprout { position:absolute;left:68px;top:3px;width:5px;height:22px;background:var(--ink);transform:rotate(-8deg); }
+    .sprout::before,.sprout::after{content:"";position:absolute;top:0;width:18px;height:10px;background:var(--light);border:3px solid var(--ink)}
+    .sprout::before{right:2px;transform:rotate(20deg)}.sprout::after{left:3px;top:5px;transform:rotate(-20deg)}
+    .tail { position:absolute;right:-5px;top:91px;width:38px;height:34px;border:5px solid var(--ink);border-left:0;background:var(--moss);z-index:-2;transform-origin:left center;animation:tailWag .7s steps(2,end) infinite; }
+    .pet[data-character="cat"] .sprout,.pet[data-character="dog"] .sprout{display:none}
+    .pet[data-character="cat"] .ear{top:11px;height:34px;clip-path:polygon(50% 0,100% 100%,0 100%)}
+    .pet[data-character="cat"] .ear::after{clip-path:polygon(50% 0,100% 100%,0 100%);inset:7px 5px 4px}
+    .pet[data-character="cat"] .tail{right:-14px;top:78px;height:55px;width:35px;border-radius:0 22px 22px 0;background:transparent}
+    .pet[data-character="dog"] .ear{top:25px;height:39px;width:31px;background:#8b613d}
+    .pet[data-character="dog"] .ear.l{left:18px;transform:rotate(15deg)}.pet[data-character="dog"] .ear.r{right:13px;transform:rotate(-15deg)}
+    .pet[data-character="dog"] .tail{right:-10px;top:79px;width:32px;height:32px;transform:rotate(-35deg)}
+    .screen { position:absolute;left:36px;top:47px;width:72px;height:50px;background:var(--screen);border:4px solid var(--ink);box-shadow:inset 0 -5px 0 rgba(0,0,0,.2);z-index:2; }
+    .eye { position:absolute;top:17px;width:12px;height:5px;background:var(--cyan); }
+    .eye.l{left:13px}.eye.r{right:13px}.mouth{position:absolute;left:28px;top:32px;width:17px;height:4px;background:var(--cyan)}
+    .tie { position:absolute;left:66px;top:99px;z-index:3;width:12px;height:22px;background:var(--orange);border:3px solid var(--ink);clip-path:polygon(0 0,100% 0,82% 40%,100% 100%,50% 86%,0 100%,18% 40%); }
+    .arm,.foot{position:absolute;background:var(--moss);border:4px solid var(--ink);z-index:-1}.arm{top:91px;width:25px;height:39px}.arm.l{left:13px;transform:rotate(13deg)}.arm.r{right:8px;transform:rotate(-13deg)}.foot{top:117px;width:34px;height:25px}.foot.l{left:31px}.foot.r{right:25px}
+    .prop { position:absolute;z-index:5;display:none;font-size:34px;line-height:1;filter:drop-shadow(2px 2px 0 var(--ink)); }
+    .keyboard{left:40px;top:118px;width:70px;height:18px;background:#d8c9a7;border:4px solid var(--ink);font-size:0}.cup{right:3px;top:83px}.glass{right:1px;top:65px}.note{right:5px;top:50px;color:var(--orange);font:bold 33px monospace}.z{right:14px;top:35px;color:var(--cream);font:bold 25px monospace;text-shadow:2px 2px var(--ink)}.star{right:4px;top:45px;color:#f1cd66;font:bold 31px monospace}
+    .food{right:-2px;top:78px}.bubbles{left:4px;top:45px;color:#bceaff;font:bold 25px monospace;text-shadow:70px 42px #bceaff,108px 4px #bceaff}.book{left:41px;top:105px;color:#f0ca69;font:bold 39px monospace}.coin{right:0;top:63px;color:#f0ca55;font:bold 31px monospace}.ball{right:-1px;top:94px;color:#e96e58;font:bold 34px monospace}.bag{right:-2px;top:89px;color:#ba8156;font:bold 34px monospace}.water{left:4px;top:122px;width:136px;color:#6fc9e8;font:bold 24px monospace;letter-spacing:-5px;text-shadow:0 7px #367fbd}.brush{right:-5px;top:74px;color:#f0c66d;font:bold 34px monospace}
+    @keyframes idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+    @keyframes jump{0%{transform:scale(1)}50%{transform:scale(.9,1.1) rotate(-4deg)}100%{transform:scale(1)}}
+    @keyframes land{0%{transform:scale(1.14,.78)}40%{transform:scale(.94,1.08)}100%{transform:scale(1)}}
+    @keyframes type{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+    @keyframes peek{0%,100%{transform:translateX(0) rotate(0)}50%{transform:translateX(24px) rotate(5deg)}}
+    @keyframes dance{0%{transform:rotate(-8deg) translateY(0)}50%{transform:rotate(8deg) translateY(-9px)}100%{transform:rotate(-8deg)}}
+    @keyframes sleep{0%,100%{transform:rotate(8deg) translateY(28px) scaleY(.72)}50%{transform:rotate(11deg) translateY(31px) scaleY(.68)}}
+    @keyframes wave{0%,100%{transform:rotate(-13deg)}50%{transform:rotate(-55deg) translateY(-10px)}}
+    @keyframes stretch{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.14) translateY(-8px)}}
+    @keyframes tailWag{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(10deg)}}
+    @keyframes scan{0%,100%{transform:translateX(-5px)}50%{transform:translateX(5px)}}
+    @keyframes sip{0%,100%{transform:rotate(0)}50%{transform:rotate(-7deg) translateY(-3px)}}
+    @keyframes squat{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.82) translateY(12px)}}
+    @keyframes scrollEyes{0%,100%{transform:translateY(-4px)}50%{transform:translateY(5px)}}
+    @keyframes look{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(5deg)}}
+    @keyframes handType{0%,100%{transform:rotate(13deg) translateY(0)}50%{transform:rotate(5deg) translateY(5px)}}
+    @keyframes handTypeR{0%,100%{transform:rotate(-13deg) translateY(5px)}50%{transform:rotate(-5deg) translateY(0)}}
+    @keyframes scrub{0%,100%{transform:translateX(-15px) rotate(-5deg)}50%{transform:translateX(15px) rotate(5deg)}}
+    @keyframes exercise{0%,100%{transform:translateY(8px) scale(1.08,.9)}50%{transform:translateY(-32px) scale(.94,1.12)}}
+    @keyframes ballBounce{0%,100%{transform:translate(-8px,8px)}50%{transform:translate(-38px,-68px)}}
+    @keyframes walk{0%{transform:translateX(-38px) rotate(-4deg)}50%{transform:translateX(38px) rotate(4deg)}100%{transform:translateX(-38px) rotate(-4deg)}}
+    @keyframes chew{0%,100%{transform:scale(1)}50%{transform:scale(1.08,.86) translateY(10px)}}
+    @keyframes foodMove{0%{transform:translate(15px,20px) scale(1.2)}70%,100%{transform:translate(-42px,-8px) scale(.55)}}
+    @keyframes swim{0%{transform:translateX(-42px) rotate(-9deg) scaleY(.92)}50%{transform:translateX(42px) rotate(8deg) scaleY(.92)}100%{transform:translateX(-42px) rotate(-9deg) scaleY(.92)}}
+    @keyframes waterWave{0%,100%{transform:translateX(-8px)}50%{transform:translateX(8px)}}
+    @keyframes brushMove{0%,100%{transform:translate(-5px,-18px) rotate(-28deg)}50%{transform:translate(-65px,28px) rotate(18deg)}}
+    .pet.jump{animation:jump .35s steps(2,end) infinite}.pet.arrive{animation:land .5s steps(3,end)}
+    .pet.type{animation:none}.pet.type .keyboard{display:block}.pet.type .arm.l{animation:handType .24s steps(2,end) 8}.pet.type .arm.r{animation:handTypeR .24s steps(2,end) 8}
+    .pet.peek{animation:peek 1.2s steps(3,end)}.pet.dance{animation:dance .45s steps(2,end) 5}.pet.dance .note,.pet.listen .note{display:block}.pet.listen{animation:idle .45s steps(2,end) 5}.pet.sleep{animation:sleep 1.2s steps(2,end) 3}.pet.sleep .z{display:block}.pet.sleep .eye{height:2px}.pet.coffee{animation:sip .55s steps(2,end) 4}.pet.coffee .cup{display:block}.pet.inspect,.pet.measure{animation:peek .65s steps(2,end) 3}.pet.inspect .glass,.pet.measure .glass{display:block}.pet.wave .arm.r{animation:wave .3s steps(2,end) 5}.pet.stretch{animation:stretch .7s steps(3,end)}
+    .pet.blink .eye{height:3px;top:20px}.pet.read{animation:scan .8s steps(3,end) 3}.pet.read .eye.l{transform:translateX(4px)}.pet.read .eye.r{transform:translateX(-4px)}.pet.think{animation:look .7s steps(2,end) 3}.pet.think .eye.r{height:2px}.pet.paint{animation:dance .55s steps(2,end) 3}.pet.paint .tie{background:#e9c66f}.pet.stamp{animation:type .25s steps(2,end) 4}.pet.admire{animation:stretch .65s steps(3,end) 3}.pet.admire .star{display:block}.pet.scroll .eye{animation:scrollEyes .5s steps(2,end) 5}.pet.look{animation:peek .8s steps(3,end) 2}.pet.sit{animation:squat .8s steps(2,end) 3}
+    .pet.feed{animation:chew .42s steps(2,end) 7}.pet.feed .food{display:block;animation:foodMove 1.05s steps(4,end) 3}.pet.feed .mouth{height:12px}
+    .pet.bathe{animation:scrub .4s steps(2,end) 8}.pet.bathe .bubbles{display:block;font-size:38px;transform:scale(1.25)}
+    .pet.exercise{animation:exercise .42s steps(2,end) 7}.pet.exercise .arm.l{transform:rotate(-55deg)}.pet.exercise .arm.r{transform:rotate(55deg)}
+    .pet.study{animation:scan .65s steps(3,end) 4}.pet.study .book{display:block}.pet.study .eye{transform:translateY(5px)}
+    .pet.work .coin{display:block}.pet.work .keyboard{display:block}.pet.work .arm.l{animation:handType .25s steps(2,end) 8}.pet.work .arm.r{animation:handTypeR .25s steps(2,end) 8}
+    .pet.play .ball{display:block;animation:ballBounce .62s steps(4,end) 6}.pet.play{animation:look .62s steps(2,end) 6}
+    .pet.travel,.pet.wander{animation:walk .85s steps(4,end) 5}.pet.travel .bag{display:block}
+    .pet.swim{animation:swim 1.05s steps(5,end) 5}.pet.swim .water{display:block;animation:waterWave .45s steps(2,end) infinite}.pet.swim .arm{transform:rotate(-65deg)}
+    .pet.groom{animation:look .7s steps(3,end) 4}.pet.groom .brush{display:block;animation:brushMove .65s steps(4,end) 5}
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <div class="bubble" id="bubble"></div><div class="shadow"></div>
+    <div class="pet" id="pet" data-character="moss">
+      <i class="sprout"></i><i class="ear l"></i><i class="ear r"></i>
+      <div class="body"></div><div class="screen"><i class="eye l"></i><i class="eye r"></i><i class="mouth"></i></div><i class="tie"></i>
+      <i class="arm l"></i><i class="arm r"></i><i class="foot l"></i><i class="foot r"></i><i class="tail"></i>
+      <i class="prop keyboard"></i><span class="prop cup">☕</span><span class="prop glass">⌕</span><span class="prop note">♪</span><span class="prop z">Z</span><span class="prop star">✦</span>
+      <span class="prop food">🍙</span><span class="prop bubbles">○</span><span class="prop book">▤</span><span class="prop coin">$</span><span class="prop ball">●</span><span class="prop bag">▣</span><span class="prop water">≈≈≈≈≈</span><span class="prop brush">▥</span>
+    </div>
+  </main>
+  <script>
+    const pet=document.getElementById('pet'),bubble=document.getElementById('bubble');let prefs={petName:'苔苔',speech:true,personality:'淡人'},hideTimer,dragging=false;
+    const appLines={code:['这段先别删，也许有用。','我看不懂，但我大受震撼。','又在让 AI 替你上班吗？'],chat:['我什么都没看见。','这条消息要不要晚点回？','正在替你保持已读不回。'],design:['这个圆角很有精神。','再挪一像素就完美了。','我负责夸，你负责改。'],browser:['你已经开了很多标签页。','这是查资料，不算摸鱼。','第 27 个标签页也有它的意义。'],document:['这句话看起来很重要。','先保存，别问我为什么。','字很多，结论应该在最后。'],music:['这首可以，工作不一定。','音量加一，烦恼减一。'],default:['我换个地方继续待着。','你忙你的，我演我的。']};
+    const actionLines={type:'手在打字，身体不许乱动。',peek:'我就看一眼',coffee:'补充一点虚假的能量',sleep:'趴一会儿，别叫我。',dance:'检测到可以摇摆的声音',listen:'这首我听过，大概。',inspect:'让我检查一下',measure:'还差一像素',admire:'这个设计有点东西',paint:'这个颜色有点意思',read:'正在认真看标题',scroll:'往下翻翻，也许有结论',stamp:'批准摸鱼',think:'让我假装思考',stretch:'坐久了，伸个懒腰',wave:'嗨，我也刚来',sit:'我先坐稳',look:'这是什么软件？',feed:'自己找点东西吃',bathe:'洗干净了，重新做人',swim:'工位附近怎么会有泳池？',groom:'整理一下毛发再上班',wander:'在窗口里巡视一圈',exercise:'运动一下，心情加十二',study:'知识正在缓慢进入脑袋',work:'它去打工，你负责摸鱼',play:'玩球时间到',travel:'出门看看，过会回来'};
+    function say(text,time=2200){if(!prefs.speech)return;bubble.textContent=text;bubble.classList.add('show');clearTimeout(hideTimer);hideTimer=setTimeout(()=>bubble.classList.remove('show'),time)}
+    function lineFor(profile){const list=appLines[profile]||appLines.default;let line=list[Math.floor(Math.random()*list.length)];if(prefs.personality==='戏精')line+='！';if(prefs.personality==='毒舌'&&profile==='code')line='这个报错看起来认识你很久了。';return line}
+    function applyPrefs(p){prefs={...prefs,...p};pet.dataset.character=prefs.petType||'moss'}
+    window.deskPet.onPreferences(applyPrefs);window.deskPet.getPreferences().then(applyPrefs);
+    window.deskPet.onAction(data=>{const{action,appName,profile}=data;pet.className=`pet ${action}`;if(action==='jump')say('等一下，我也过去——',700);else if(action==='arrive')say(`${prefs.petName}已降落在 ${appName}`,1500);else say(actionLines[action]||lineFor(profile));clearTimeout(window.resetTimer);const longActions=['sleep','travel','wander','swim','study','work','play','feed','groom'];window.resetTimer=setTimeout(()=>{if(!dragging)pet.className='pet'},longActions.includes(action)?4800:2600)});
+    pet.addEventListener('mouseenter',()=>window.deskPet.setHover(true));pet.addEventListener('mouseleave',()=>{if(!dragging)window.deskPet.setHover(false)});pet.addEventListener('mousedown',e=>{if(e.button!==0)return;dragging=true;pet.style.animation='none'});window.addEventListener('mousemove',e=>{if(dragging)window.deskPet.dragTo({x:e.screenX,y:e.screenY})});window.addEventListener('mouseup',()=>{dragging=false;pet.style.animation=''});pet.addEventListener('click',()=>say(['摸一下，功德加三。','别戳了，我在上班。','检测到人类需要安慰。'][Math.floor(Math.random()*3)]));pet.addEventListener('contextmenu',e=>{e.preventDefault();window.deskPet.showContextMenu()});
+  </script>
+</body>
+</html>

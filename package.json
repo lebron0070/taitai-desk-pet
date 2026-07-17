@@ -1,0 +1,40 @@
+{
+  "name": "still-employed-desk-pet",
+  "version": "0.4.0",
+  "private": true,
+  "author": "Taitai Studio",
+  "description": "会跨应用跳来跳去的桌面上班搭子",
+  "main": "desktop/main.js",
+  "scripts": {
+    "desktop": "electron .",
+    "start": "electron .",
+    "test": "node --test desktop/*.test.js",
+    "build:mac": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg zip --config.directories.output=release",
+    "build:win": "electron-builder --win nsis zip --x64 --config.directories.output=release"
+  },
+  "devDependencies": {
+    "electron": "^37.2.3",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.workbench.taitai",
+    "productName": "今天也没离职",
+    "files": ["desktop/**/*", "package.json"],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": ["dmg", "zip"],
+      "artifactName": "Taitai-${version}-${arch}.${ext}"
+    },
+    "win": {
+      "target": ["nsis", "zip"],
+      "artifactName": "Taitai-${version}-win-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

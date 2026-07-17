@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+dist/
+*.log
+output/
+release/*
+!release/*.md
+!release/*.txt
+promo-video/*.mp4
+promo-video/review-contact.jpg
+.idea/
+.vscode/

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>上班搭子设置</title>
+  <style>
+    :root { --ink:#293028; --paper:#f5f0e5; --deep:#e8dfcf; --green:#778b72; --orange:#df795e; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; color:var(--ink); font-family:"Songti SC","Noto Serif SC",serif; background:linear-gradient(rgba(41,48,40,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(41,48,40,.045) 1px,transparent 1px),var(--deep); background-size:24px 24px; }
+    main { padding:54px 28px 28px; }
+    .head { display:flex; align-items:center; gap:14px; margin-bottom:22px; }
+    .avatar { width:56px; height:56px; display:grid; place-items:center; border:1.5px solid var(--ink); border-radius:48% 52% 46% 50%; background:#aab99d; box-shadow:3px 3px 0 var(--ink); font-size:27px; }
+    h1 { margin:0; font-size:23px; letter-spacing:.06em; }
+    .sub { margin-top:4px; color:#697267; font-size:11px; }
+    .card { padding:7px 18px; border:1.5px solid var(--ink); border-radius:20px; background:rgba(245,240,229,.94); box-shadow:4px 4px 0 var(--ink); }
+    .pet-picker { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin:0 0 14px; }
+    .pet-option { cursor:pointer; }
+    .pet-option input { position:absolute; opacity:0; pointer-events:none; }
+    .pet-tile { display:grid; place-items:center; min-height:78px; border:1.5px solid var(--ink); background:rgba(245,240,229,.85); box-shadow:2px 2px 0 var(--ink); transition:.15s; }
+    .pet-tile b { display:block; margin-top:5px; font-size:11px; }
+    .pet-pixel { font:bold 25px/1 monospace; }
+    .pet-option input:checked + .pet-tile { transform:translate(-2px,-2px); box-shadow:5px 5px 0 var(--ink); background:#f3d88a; }
+    .row { min-height:64px; display:flex; align-items:center; justify-content:space-between; gap:20px; border-bottom:1px dashed rgba(41,48,40,.18); }
+    .row:last-child { border:0; }
+    label strong { display:block; font-size:14px; }
+    label small { display:block; margin-top:4px; color:#737b70; font-size:10px; }
+    input[type="text"], input[type="time"], select { width:145px; border:1px solid var(--ink); border-radius:10px; padding:9px 10px; background:#fffdf7; color:var(--ink); font:12px inherit; outline:none; }
+    input:focus, select:focus { box-shadow:0 0 0 3px rgba(119,139,114,.22); }
+    .switch { position:relative; width:45px; height:25px; }
+    .switch input { opacity:0; width:0; height:0; }
+    .slider { position:absolute; inset:0; border:1px solid var(--ink); border-radius:999px; background:#d8d5ca; cursor:pointer; transition:.2s; }
+    .slider::after { content:""; position:absolute; width:17px; height:17px; top:3px; left:4px; border-radius:50%; background:var(--ink); transition:.2s; }
+    input:checked + .slider { background:#a9bd9f; }
+    input:checked + .slider::after { transform:translateX(18px); }
+    .save { width:100%; margin-top:18px; border:1.5px solid var(--ink); border-radius:15px; padding:13px; background:var(--orange); color:var(--ink); box-shadow:3px 3px 0 var(--ink); font:700 14px inherit; cursor:pointer; }
+    .save:active { transform:translate(2px,2px); box-shadow:1px 1px 0 var(--ink); }
+    .privacy { margin:16px 5px 0; color:#687065; font-size:10px; line-height:1.6; text-align:center; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="head"><div class="avatar">ʕ·ᴥ·ʔ</div><div><h1>上班搭子设置</h1><div class="sub">让它懂事一点，但别太懂事。</div></div></div>
+    <div class="pet-picker">
+      <label class="pet-option"><input type="radio" name="petType" value="moss"><span class="pet-tile"><span class="pet-pixel">▣</span><b>苔精灵</b></span></label>
+      <label class="pet-option"><input type="radio" name="petType" value="cat"><span class="pet-tile"><span class="pet-pixel">/ᐠ｡ꞈ｡ᐟ\</span><b>橘猫</b></span></label>
+      <label class="pet-option"><input type="radio" name="petType" value="dog"><span class="pet-tile"><span class="pet-pixel">▼・ᴥ・▼</span><b>柴犬</b></span></label>
+    </div>
+    <section class="card">
+      <div class="row"><label><strong>搭子的名字</strong><small>它跳过来时会用这个名字</small></label><input id="petName" type="text" maxlength="8" /></div>
+      <div class="row"><label><strong>性格</strong><small>决定它说话的发疯程度</small></label><select id="personality"><option>淡人</option><option>戏精</option><option>毒舌</option></select></div>
+      <div class="row"><label><strong>允许说话</strong><small>显示软件专属气泡文案</small></label><label class="switch"><input id="speech" type="checkbox" /><span class="slider"></span></label></div>
+      <div class="row"><label><strong>开机后出现</strong><small>登录电脑时自动陪你上班</small></label><label class="switch"><input id="launchAtLogin" type="checkbox" /><span class="slider"></span></label></div>
+      <div class="row"><label><strong>下班时间</strong><small>下班后它会主动收拾东西</small></label><input id="workEnd" type="time" /></div>
+    </section>
+    <button class="save" id="save">保存，继续假装上班</button>
+    <p class="privacy">所有设置只保存在本机。它只读取当前软件名称和窗口位置，不读取聊天、文档或屏幕内容。</p>
+  </main>
+  <script>
+    const ids = ['petName','personality','speech','launchAtLogin','workEnd'];
+    window.deskPet.getPreferences().then(p => { ids.forEach(id => { const el=document.getElementById(id); el[el.type==='checkbox'?'checked':'value']=p[id]; }); const radio=document.querySelector(`[name="petType"][value="${p.petType||'moss'}"]`); if(radio)radio.checked=true; });
+    document.getElementById('save').addEventListener('click', async () => {
+      const data={petType:document.querySelector('[name="petType"]:checked')?.value||'moss'}; ids.forEach(id=>{const el=document.getElementById(id);data[id]=el.type==='checkbox'?el.checked:el.value;});
+      await window.deskPet.savePreferences(data); const btn=document.getElementById('save'); btn.textContent='保存好了 ✓'; setTimeout(()=>btn.textContent='保存，继续假装上班',1500);
+    });
+  </script>
+</body>
+</html>
