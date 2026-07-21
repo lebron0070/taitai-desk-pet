@@ -1,4 +1,4 @@
-今天也没离职 v0.4.0 Beta
+今天也没离职 v0.4.1 Beta
 
 这是一个会站在当前软件窗口边缘、自己做动作的像素桌面宠物。
 
@@ -7,15 +7,15 @@
 - Windows：Windows 10/11 x64
 
 macOS 安装方法
-1. 下载 Taitai-0.4.0-arm64.dmg。
+1. 下载 Taitai-0.4.1-arm64.dmg。
 2. 双击打开 DMG，将“今天也没离职”拖入“应用程序”。
 3. 从“应用程序”中启动。
 4. 首次运行时，按提示授予“辅助功能”权限；宠物需要此权限读取当前窗口的位置，才能站到窗口边缘。
 
 Windows 安装方法
-1. 下载 Taitai-0.4.0-win-x64.exe。
+1. 下载 Taitai-0.4.1-win-x64.exe。
 2. 双击安装并从开始菜单启动“今天也没离职”。
-3. 如果不想安装，也可以下载 Taitai-0.4.0-win-x64.zip，解压后运行其中的程序。
+3. 如果不想安装，也可以下载 Taitai-0.4.1-win-x64.zip，解压后运行其中的程序。
 
 Beta 版本说明
 - 当前公开测试包尚未完成商业代码签名；macOS 可能显示 Gatekeeper 提示，Windows 可能显示 Microsoft Defender SmartScreen 提示。
@@ -24,8 +24,8 @@ Beta 版本说明
 - 如果你不确定文件来源，请不要绕过系统的安全提示。
 
 校验值
-文件：Taitai-0.4.0-arm64.dmg
-SHA-256：90e58eb5819655a62df1487d7ecc38563ba17de194678d39d0e40f43838ddf8e
+文件：Taitai-0.4.1-arm64.dmg
+SHA-256：58bc918300397588369e9962d0cd2f3e15a1c89ba741d05e57b713d2ef29b27b
 
 反馈时请附上
 - Mac 型号和 macOS 版本

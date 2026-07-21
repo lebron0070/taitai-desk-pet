@@ -38,12 +38,12 @@ pnpm install
 pnpm run build:win
 ```
 
-将生成 `Taitai-0.4.0-win-x64.exe` 安装程序和 `Taitai-0.4.0-win-x64.zip` 免安装压缩包。推送 `v*` 标签时，`.github/workflows/release.yml` 会自动构建并附加到 GitHub Release。
+将生成 `Taitai-0.4.1-win-x64.exe` 安装程序和 `Taitai-0.4.1-win-x64.zip` 免安装压缩包。推送 `v*` 标签时，`.github/workflows/release.yml` 会自动构建并附加到 GitHub Release。
 
 ## 当前公开测试系统
 
-- macOS：Apple 芯片（M1 / M2 / M3 / M4），下载 `Taitai-0.4.0-arm64.dmg`
-- Windows：Windows 10/11 x64，下载 `Taitai-0.4.0-win-x64.exe`
+- macOS：Apple 芯片（M1 / M2 / M3 / M4），下载 `Taitai-0.4.1-arm64.dmg`
+- Windows：Windows 10/11 x64，下载 `Taitai-0.4.1-win-x64.exe`
 - 两个平台的 Beta 包暂未进行商业代码签名，只应从项目官方 GitHub Releases 页面下载
 
 ## 部署

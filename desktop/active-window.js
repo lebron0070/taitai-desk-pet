@@ -51,9 +51,14 @@ function run(executable, args, execFileImpl = execFile) {
 
 function parseMacResult(raw) {
   if (!raw) return null;
-  const [name, x, y, width, height] = raw.split('|');
+  const [name, rawX, rawY, rawWidth, rawHeight] = raw.split('|');
   if (!name) return null;
-  return { name, x: +x || 0, y: +y || 0, width: +width || 0, height: +height || 0, hasBounds: Boolean(+width && +height) };
+  const x = Number(rawX);
+  const y = Number(rawY);
+  const width = Number(rawWidth);
+  const height = Number(rawHeight);
+  const hasBounds = [x, y, width, height].every(Number.isFinite) && width > 0 && height > 0;
+  return { name, x: hasBounds ? x : 0, y: hasBounds ? y : 0, width: hasBounds ? width : 0, height: hasBounds ? height : 0, hasBounds };
 }
 
 function parseWindowsResult(raw) {
@@ -61,11 +66,12 @@ function parseWindowsResult(raw) {
   try {
     const value = JSON.parse(raw);
     if (!value?.name) return null;
-    const x = Number(value.x) || 0;
-    const y = Number(value.y) || 0;
-    const width = Number(value.width) || 0;
-    const height = Number(value.height) || 0;
-    return { name: String(value.name), title: String(value.title || ''), x, y, width, height, hasBounds: Boolean(width && height) };
+    const x = Number(value.x);
+    const y = Number(value.y);
+    const width = Number(value.width);
+    const height = Number(value.height);
+    const hasBounds = [x, y, width, height].every(Number.isFinite) && width > 0 && height > 0;
+    return { name: String(value.name), title: String(value.title || ''), x: hasBounds ? x : 0, y: hasBounds ? y : 0, width: hasBounds ? width : 0, height: hasBounds ? height : 0, hasBounds };
   } catch {
     return null;
   }

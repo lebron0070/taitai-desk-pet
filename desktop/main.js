@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage, systemPref
 const fs = require('node:fs');
 const path = require('node:path');
 const { getActiveWindow } = require('./active-window');
+const { toIntegerPoint } = require('./position');
 
 let petWindow, settingsWindow, tray, pollTimer, idleTimer, actionTimer;
 let preferences, petState;
@@ -90,12 +91,19 @@ function fallbackPoint() {
   return {x:area.x+area.width-245,y:area.y+18,mode:'fallback'};
 }
 
+function setPetPosition(point) {
+  const safePoint=toIntegerPoint(point);
+  if(!petWindow||!safePoint)return false;
+  try { petWindow.setPosition(safePoint.x,safePoint.y,false);return true; }
+  catch { return false; }
+}
+
 function createPetWindow() {
   petWindow=new BrowserWindow({width:230,height:230,transparent:true,frame:false,resizable:false,hasShadow:false,alwaysOnTop:true,skipTaskbar:true,focusable:false,show:false,type:process.platform==='darwin'?'panel':undefined,webPreferences:{preload:path.join(__dirname,'preload.js'),contextIsolation:true,nodeIntegration:false}});
   petWindow.setAlwaysOnTop(true,'floating');
   petWindow.setVisibleOnAllWorkspaces(true,{visibleOnFullScreen:true});
   petWindow.loadFile(path.join(__dirname,'pet.html'));
-  petWindow.once('ready-to-show',()=>{const p=fallbackPoint();petWindow.setPosition(p.x,p.y,false);if(preferences.enabled)petWindow.showInactive();petWindow.webContents.send('preferences',preferences);});
+  petWindow.once('ready-to-show',()=>{setPetPosition(fallbackPoint());if(preferences.enabled)petWindow.showInactive();petWindow.webContents.send('preferences',preferences);});
   petWindow.on('closed',()=>petWindow=null);
 }
 
@@ -165,10 +173,12 @@ function dockAt(win,force=false) {
   const key=win.name;
   if(moving&&!force){pendingWindow=win;return;}
   if(!force&&key===lastDockedKey)return;
-  moving=true;pendingWindow=null;clearTimeout(actionTimer);const token=++moveToken;const target=win.hasBounds?dockingPoint(win):fallbackPoint();const profile=profileFor(win.name);
+  moving=true;pendingWindow=null;clearTimeout(actionTimer);const token=++moveToken;let target=fallbackPoint();
+  if(win.hasBounds){try{target=dockingPoint(win);}catch{target=fallbackPoint();}}
+  const safeTarget=toIntegerPoint(target)||toIntegerPoint(fallbackPoint());if(!safeTarget){moving=false;return;}target={...target,...safeTarget};const profile=profileFor(win.name);
   const [sx,sy]=petWindow.getPosition();const started=Date.now();const distance=Math.hypot(target.x-sx,target.y-sy);const duration=clamp(560+distance*.14,620,1050);
   petWindow.webContents.send('pet-action',{action:'jump',appName:win.name,profile:profile.id,anchorMode:target.mode,speech:preferences.speech});
-  const tick=()=>{if(!petWindow||token!==moveToken)return;const t=Math.min(1,(Date.now()-started)/duration),e=1-Math.pow(1-t,3),arc=Math.sin(t*Math.PI)*clamp(distance*.13,48,115);petWindow.setPosition(Math.round(sx+(target.x-sx)*e),Math.round(sy+(target.y-sy)*e-arc),false);if(t<1)return setTimeout(tick,16);
+  const tick=()=>{if(!petWindow||token!==moveToken)return;const t=Math.min(1,(Date.now()-started)/duration),e=1-Math.pow(1-t,3),arc=Math.sin(t*Math.PI)*clamp(distance*.13,48,115);if(!setPetPosition({x:sx+(target.x-sx)*e,y:sy+(target.y-sy)*e-arc})){moving=false;lastDockedKey='';return;}if(t<1)return setTimeout(tick,16);
     moving=false;lastDockedKey=key;petWindow.webContents.send('pet-action',{action:'arrive',appName:win.name,profile:profile.id,anchorMode:target.mode,speech:preferences.speech});
     clearTimeout(actionTimer);actionTimer=setTimeout(()=>playProfileAction(win),850);scheduleIdle();
     if(pendingWindow){const next=pendingWindow;pendingWindow=null;setTimeout(()=>dockAt(next),80);}
@@ -186,7 +196,7 @@ async function observeDesktop(force=false) {
 function forceObserve(){lastDockedKey='';observeDesktop(true);}
 
 ipcMain.on('pet-hover',()=>{});
-ipcMain.on('pet-drag',(_e,p)=>{if(petWindow&&Number.isFinite(p?.x)){moveToken++;moving=false;petWindow.setPosition(Math.round(p.x-115),Math.round(p.y-115),false);}});
+ipcMain.on('pet-drag',(_e,p)=>{if(petWindow&&toIntegerPoint(p)){moveToken++;moving=false;setPetPosition({x:p.x-115,y:p.y-115});}});
 ipcMain.handle('get-preferences',()=>preferences);
 ipcMain.handle('save-preferences',(_e,next)=>{savePreferences(next);return preferences;});
 ipcMain.on('pet-context-menu',()=>Menu.buildFromTemplate([

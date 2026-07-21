@@ -1,7 +1,13 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const { parseWindowsResult } = require('./active-window');
+const { parseMacResult, parseWindowsResult } = require('./active-window');
+
+test('rejects invalid macOS window bounds without losing the app name', () => {
+  assert.deepEqual(parseMacResult('Finder|10|undefined|900|700'), {
+    name: 'Finder', x: 0, y: 0, width: 0, height: 0, hasBounds: false
+  });
+});
 
 test('normalizes a Windows foreground window with bounds', () => {
   const result = parseWindowsResult(JSON.stringify({
@@ -42,4 +48,10 @@ test('returns null for empty or invalid Windows output', () => {
   assert.equal(parseWindowsResult(''), null);
   assert.equal(parseWindowsResult('not json'), null);
   assert.equal(parseWindowsResult('{"x":1}'), null);
+});
+
+test('rejects non-finite Windows bounds', () => {
+  assert.deepEqual(parseWindowsResult('{"name":"Code","x":10,"y":"Infinity","width":900,"height":700}'), {
+    name: 'Code', title: '', x: 0, y: 0, width: 0, height: 0, hasBounds: false
+  });
 });
