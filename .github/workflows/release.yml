@@ -38,8 +38,8 @@ jobs:
       - name: Attach Windows packages to release
         uses: softprops/action-gh-release@v2
         with:
-          name: 今天也没离职 v0.4.0 Beta
-          body_path: release/GitHub-Release-v0.4.0.md
+          name: 今天也没离职 v0.4.1 Beta
+          body_path: release/GitHub-Release-v0.4.1.md
           prerelease: true
           files: |
             release/Taitai-*-win-x64.exe
